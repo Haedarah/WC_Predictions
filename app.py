@@ -17,6 +17,15 @@ mapping={
 4:'Mahmoud'
 }
 
+mapping2={
+'Hasan':0,
+'Ali':1,
+'Abdul':2,
+'Haedarah':3,
+'Mahmoud':4
+}
+
+
 data=pd.read_csv("Data/data.csv")
 res=[["Hasan",0],["Ali",0],["Abdul",0],["Haedarah",0],["Mahmoud",0]]
 standings=pd.DataFrame(res,columns=['Name','Pts'])
@@ -60,6 +69,8 @@ with UpperBlock:
 	st.header("Standings")
 	col1,col2,col3=st.columns([1,1,1],gap="large")
 
+	displacement=[[],[],[],[],[]]
+
 	for i in range(5):
 		a=data[data['Name']==mapping[i]]
 		b=data[data['Name']=="REAL"]
@@ -88,18 +99,23 @@ with UpperBlock:
 				
 				elif player_home==real_home and player_away==real_away:
 					cur+=5
+					displacement[i].append("+5")
 
 				elif (player_home-player_away)==(real_home-real_away):
 					cur+=3
+					displacement[i].append("+3")
 
 				elif (player_home-player_away)*(real_home-real_away)>0:
 					cur+=2
+					displacement[i].append("+2")
 
 				elif (player_home-player_away)*(real_home-real_away)==0:
 					cur-=1
+					displacement[i].append("-1")
 
 				else:
 					cur-=3
+					displacement[i].append("-3")
  				
 		standings["Pts"][standings["Name"]==mapping[i]]=cur
 
@@ -121,15 +137,17 @@ with LowerBlock:
 	with col1:
 		name=st.selectbox("Choose a player to display his/her predictions",data['Name'][:-1])
 
-	col11,col22=st.columns([1,1],gap="large")
+	col11,col22,col33,col44=st.columns([1,1,1,1],gap="small")
 
 	with col11:
-		st.subheader("Predicted scores by "+name+":")
+		st.subheader(name+"'s Predictions:")
+
 
 		line=""
 		result=" ("
 		flag=2
 		idx=1
+		idxx=0
 
 		a=data[data['Name']==name]
 		alist=a.columns
@@ -199,6 +217,14 @@ with LowerBlock:
 				st.write(line+result)
 				line=""
 				result=" ("
+
+	with col33:
+		st.subheader("Pts change +/-:")
+		for i in displacement[mapping2[name]]:
+			if i=="-1" or i=="-3":
+				st.markdown("<span style='color:Red;'> %s </span>" % (i),unsafe_allow_html=True)
+			else:
+				st.markdown("<span style='color:Green;'> %s </span>" % (i),unsafe_allow_html=True)
 
 
 with footer:
